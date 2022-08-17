@@ -76,6 +76,32 @@ class Donators(commands.Cog):
             await ctx.send(f"{member.mention} has cancelled the perk redemption.")
             return False
 
+    async def resetmem(self, user):
+        guild = self.bot.get_guild(645753561329696785)
+        try:
+            member = guild.get_member(user)
+        except discord.NotFound:
+            await self.coll.update_one({"user_id": user}, {"$set": {"perk_name": "None", "expiry": "None"}})
+            return True
+        donator5 = guild.get_role(794300647137738762)
+        donator10 = guild.get_role(794301192359378954)
+        donator20 = guild.get_role(794301389769015316)
+        donator30 = guild.get_role(794302939371929622)
+        if donator5 in member.roles:
+            await member.remove_roles(donator5)
+        if donator10 in member.roles:
+            await member.remove_roles(donator10)
+        if donator20 in member.roles:
+            await member.remove_roles(donator20)
+        if donator30 in member.roles:
+            await member.remove_roles(donator30)
+        await self.coll.update_one({"user_id": user}, {"$set": {"perk_name": "None", "expiry": "None"}})
+        await member.send("You cash donator perks have expired in `The Farm`. gg/dank")
+        ar = await self.bot.db.plugins.Autoreact.find_one({"user_id": user})
+        if ar:
+            await self.bot.db.plugins.Autoreact.delete_one({"user_id": user})
+        return True
+
     @commands.group(invoke_without_command=True)
     async def donator(self, ctx):
         """
@@ -501,52 +527,8 @@ class Donators(commands.Cog):
             current_time = datetime.utcnow()
             for x in fetchall:
                 if current_time >= x["expiry"]:
-                    perk_level = x["perk_name"]
                     user = x["user_id"]
-                    guild = self.bot.get_guild(645753561329696785)
-                    member = guild.get_member(user)
-                    if perk_level == "$5":
-                        donator5 = guild.get_role(794300647137738762)
-                        await member.remove_roles(donator5)
-                        await self.coll.update_one({"user_id": user},
-                                                   {"$set": {"perk_name": "None", "expiry": "None"}})
-                        await member.send("You cash donator perks have expired in `The Farm`. gg/dank")
-                    elif perk_level == "$10":
-                        donator5 = guild.get_role(794300647137738762)
-                        await member.remove_roles(donator5)
-                        donator10 = guild.get_role(794301192359378954)
-                        await member.remove_roles(donator10)
-                        await self.coll.update_one({"user_id": user},
-                                                   {"$set": {"perk_name": "None", "expiry": "None"}})
-                        await member.send("You cash donator perks have expired in `The Farm`. gg/dank")
-                    elif perk_level == "$20":
-                        donator5 = guild.get_role(794300647137738762)
-                        await member.remove_roles(donator5)
-                        donator10 = guild.get_role(794301192359378954)
-                        await member.remove_roles(donator10)
-                        donator20 = guild.get_role(794301389769015316)
-                        await member.remove_roles(donator20)
-                        await self.coll.update_one({"user_id": user},
-                                                   {"$set": {"perk_name": "None", "expiry": "None"}})
-                        ar = await self.bot.db.plugins.Autoreact.find_one({"user_id": user})
-                        if ar:
-                            await self.bot.db.plugins.Autoreact.delete_one({"user_id": user})
-                        await member.send("You cash donator perks have expired in `The Farm`. gg/dank")
-                    elif perk_level == "$30":
-                        donator5 = guild.get_role(794300647137738762)
-                        await member.remove_roles(donator5)
-                        donator10 = guild.get_role(794301192359378954)
-                        await member.remove_roles(donator10)
-                        donator20 = guild.get_role(794301389769015316)
-                        await member.remove_roles(donator20)
-                        donator30 = guild.get_role(794302939371929622)
-                        await member.remove_roles(donator30)
-                        await self.coll.update_one({"user_id": user},
-                                                   {"$set": {"perk_name": "None", "expiry": "None"}})
-                        ar = await self.bot.db.plugins.Autoreact.find_one({"user_id": user})
-                        if ar:
-                            await self.bot.db.plugins.Autoreact.delete_one({"user_id": user})
-                        await member.send("You cash donator perks have expired in `The Farm`. gg/dank")
+                    await self.resetmem(user)
         except Exception as e:
             print(e)
 
@@ -614,7 +596,7 @@ class Donators(commands.Cog):
         await channel.delete(reason="Your channel has been deleted since you’re no longer in the top 10 donators!")
         await self.coll.update_one({"user_id": user_id}, {"$set": {"channel_id": "None"}})
 
-    @tasks.loop(hours=12)
+    @tasks.loop(hours=11)
     async def update_vcs(self):
         top3 = await self.coll.find().sort("total_donated", -1).limit(3).to_list(length=3)
         """Update vcs in a category"""
@@ -628,6 +610,24 @@ class Donators(commands.Cog):
                 continue
 
             await vc.edit(name=f"{user} (${donated})")
+
+
+"""
+    @tasks.loop(hours=11)
+    async def top10_roles(self):
+        top10 = await self.coll.aggregate([{"$set": {"Donation30d": {"$filter": {"input": "$Donation", "cond": {
+            "$lt": [{"$dateDiff": {"startDate": "$$this.Date", "endDate": "$$NOW", "unit": "day"}}, 30]}}}}}, {"$set": {
+            "sum30d": {"$sum": {"$filter": {"input": "$Donation30d.Value", "cond": {"$gt": ["$$this", 0]}}}}}},
+                                           {"$sort": {"sum30d": -1}}, {"$limit": 10}]).to_list(None)
+        toprole = guild.get_role(1234)
+        for z in top10:
+            user_id = z["user_id"]
+            member = await self.bot.fetch_user(user_id)
+            if toprole in member.roles:
+                continue
+            else:
+                await member.add_roles(toprole)
+"""
 
 
 async def setup(bot):
