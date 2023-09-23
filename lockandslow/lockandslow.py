@@ -50,6 +50,7 @@ class LockAndSlow(commands.Cog):
             995563935874949160,
             756552586248585368,
             747853054329487500,
+            1150860516349190144
         ]
         if ctx.author.top_role.id in (855877108055015465, 814004142796046408):
             if channel.id in allowed_channels:
@@ -105,6 +106,7 @@ class LockAndSlow(commands.Cog):
             995563935874949160,
             756552586248585368,
             747853054329487500,
+            1150860516349190144
         ]
         if ctx.author.top_role.id in (855877108055015465, 814004142796046408):
             if channel.id in allowed_channels:
