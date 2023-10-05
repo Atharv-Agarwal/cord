@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
-
+from core import checks
+from core.models import PermissionLevel
 
 class StickyRoles(commands.Cog):
     """
@@ -22,6 +23,7 @@ class StickyRoles(commands.Cog):
         )
 
     @commands.command()
+    @checks.has_permissions(PermissionLevel.MODERATOR)
     async def addsticky(self, ctx, role: discord.Role):
         """Adds a sticky role to the database"""
         check = await self.coll.find_one({"role_id": role.id})
@@ -31,6 +33,7 @@ class StickyRoles(commands.Cog):
         await ctx.send(f"Added `{role.name}` to the sticky roles")
 
     @commands.command()
+    @checks.has_permissions(PermissionLevel.MODERATOR)
     async def removesticky(self, ctx, role: discord.Role):
         """Removes a sticky role from the database"""
         check = await self.coll.find_one({"role_id": role.id})
