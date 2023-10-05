@@ -158,22 +158,25 @@ class Reminders(commands.Cog):
         for reminder in reminders:
             try:
                 user = self.bot.get_user(reminder["user_id"])
-                link = reminder["msg_link"]
-                embed = discord.Embed(
-                    title=f"**Reminder!**",
-                    description=f"You asked to be reminded of \"{reminder['message']}\" [here]({link})",
-                    color=0x10EA64,
-                )
-                try:
-                    await user.send(embed=embed)
-                except (discord.errors.Forbidden, discord.errors.NotFound):
+                if user:
+                    link = reminder["msg_link"]
+                    embed = discord.Embed(
+                        title=f"**Reminder!**",
+                        description=f"You asked to be reminded of \"{reminder['message']}\" [here]({link})",
+                        color=0x10EA64,
+                    )
+                    try:
+                        await user.send(embed=embed)
+                    except (discord.errors.Forbidden, discord.errors.NotFound):
+                        await self.coll.delete_one({"_id": reminder["_id"]})
                     await self.coll.delete_one({"_id": reminder["_id"]})
-                await self.coll.delete_one({"_id": reminder["_id"]})
-                fetch = await self.coll.find().sort("time", 1).to_list(1)
-                for x in fetch:
-                    if x["time"] > now:
-                        next_reminder = x["time"]
-                        return await discord.utils.sleep_until(next_reminder)
+                    fetch = await self.coll.find().sort("time", 1).to_list(1)
+                    for x in fetch:
+                        if x["time"] > now:
+                            next_reminder = x["time"]
+                            return await discord.utils.sleep_until(next_reminder)
+                else:
+                    await self.coll.delete_one({"_id": reminder["_id"]})
             except Exception as e:
                 print(e)
 
