@@ -40,12 +40,12 @@ class ForumChannels(commands.Cog):
             if entry.target.id != thread.id:
                 continue
 
-            if entry.user.id == owner_id:
+            if entry.user.id not in (682698693472026749,658770981816500234):
                 hours_of_inactivity = (
                     FORUM_CHANNELS_COOLDOWN_MAP[payload.parent_id] // 3600
                 )
                 return await thread.send(
-                    f"<@{owner_id}> You cannot archive your own thread. It has been unarchived and will be automatically archived after {hours_of_inactivity} hour{' s'[bool(hours_of_inactivity-1)]} of inactivity."
+                    f"You cannot archive this thread. It has been unarchived and will be automatically archived after {hours_of_inactivity} hour{' s'[bool(hours_of_inactivity-1)]} of inactivity."
                 )
 
             # farmmail
