@@ -39,18 +39,14 @@ class ForumChannels(commands.Cog):
         ):
             if entry.target.id != thread.id:
                 continue
-
-            if entry.user.id not in (682698693472026749,658770981816500234):
+            
+            if entry.user.id != 855270214656065556:
                 hours_of_inactivity = (
                     FORUM_CHANNELS_COOLDOWN_MAP[payload.parent_id] // 3600
                 )
                 return await thread.send(
                     f"You cannot archive this thread. It has been unarchived and will be automatically archived after {hours_of_inactivity} hour{' s'[bool(hours_of_inactivity-1)]} of inactivity."
                 )
-
-            # farmmail
-            if entry.user.id == 855270214656065556:
-                return
 
     @tasks.loop(minutes=30)
     async def archive_and_lock_threads(self):
