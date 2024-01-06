@@ -39,8 +39,11 @@ class ForumChannels(commands.Cog):
         ):
             if entry.target.id != thread.id:
                 continue
-            
-            if entry.user.id != 855270214656065556:
+                
+            if entry.user.id == 855270214656065556:
+                return
+                
+            else:
                 hours_of_inactivity = (
                     FORUM_CHANNELS_COOLDOWN_MAP[payload.parent_id] // 3600
                 )
