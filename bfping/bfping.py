@@ -129,7 +129,7 @@ class BFPing(commands.Cog):
             gwm = ctx.guild.get_role(855877108055015465)
             await ctx.author.remove_roles(gwm)
             return await ctx.send("Pretty sure you don't want to do that man")
-        if ctx.channel.id == 756566417456889965:
+        if ctx.channel.id in (756566417456889965,995556725694402691):
             await ctx.channel.purge(limit=1)
             await ctx.send(f"<@&713898461606707273> {messages}")
         else:
