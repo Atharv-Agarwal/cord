@@ -27,7 +27,7 @@ class ForumChannels(commands.Cog):
         if payload.parent_id not in FORUM_CHANNELS_COOLDOWN_MAP:
             return
 
-        if payload.data["thread_metadata"]["archived"] is False or payload.data["thread_metadata"]["locked"] is False:
+        if payload.data["thread_metadata"]["archived"] is False and payload.data["thread_metadata"]["locked"] is False:
             return
 
         farm = self.bot.get_guild(645753561329696785)
