@@ -27,7 +27,7 @@ class ForumChannels(commands.Cog):
         if payload.parent_id not in FORUM_CHANNELS_COOLDOWN_MAP:
             return
 
-        if payload.data["thread_metadata"]["archived"] is False:
+        if payload.data["thread_metadata"]["archived"] is False or payload.data["thread_metadata"]["locked"] is False:
             return
 
         farm = self.bot.get_guild(645753561329696785)
@@ -47,8 +47,11 @@ class ForumChannels(commands.Cog):
                 hours_of_inactivity = (
                     FORUM_CHANNELS_COOLDOWN_MAP[payload.parent_id] // 3600
                 )
+                await thread.edit(
+                        locked=False, archived=False, reason="User tried closing thread"
+                    )
                 return await thread.send(
-                    f"You cannot archive this thread. It has been unarchived and will be automatically archived after {hours_of_inactivity} hour{' s'[bool(hours_of_inactivity-1)]} of inactivity."
+                    f"You cannot archive or lock this thread. It has been unarchived and will be automatically archived after {hours_of_inactivity} hour{' s'[bool(hours_of_inactivity-1)]} of inactivity."
                 )
 
     @tasks.loop(minutes=30)
